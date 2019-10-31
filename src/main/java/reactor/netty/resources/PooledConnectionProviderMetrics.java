@@ -30,7 +30,6 @@ final class PooledConnectionProviderMetrics {
 	static void registerMetrics(String poolName, String id, String remoteAddress,
 			InstrumentedPool<PooledConnectionProvider.PooledConnection> pool) {
 		String name = String.format(NAME, poolName);
-
 		Gauge.builder(name + TOTAL_CONNECTIONS, pool, p -> p.metrics().allocatedSize())
 		     .description("The number of all connections, active or idle.")
 		     .tags(ID, id, REMOTE_ADDRESS, remoteAddress)
