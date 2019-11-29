@@ -48,6 +48,8 @@ final class WebsocketClientOperations extends HttpClientOperations
 
     volatile int closeSent;
 
+    volatile boolean transparent;
+
     WebsocketClientOperations(URI currentURI,
                               String protocols,
                               int maxFramePayloadLength,
@@ -125,7 +127,10 @@ final class WebsocketClientOperations extends HttpClientOperations
 
         //is used gateway?
         try {
-            this.getClass().getClassLoader().loadClass("org.springframework.web.reactive.socket.adapter.ReactorNettyWebSocketSession");
+            if (!transparent) {
+                this.getClass().getClassLoader().loadClass("org.springframework.web.reactive.socket.adapter.ReactorNettyWebSocketSession");
+                transparent = true;
+            }
         } catch (ClassNotFoundException e) {
             if (msg instanceof PingWebSocketFrame) {
                 channel().writeAndFlush(new PongWebSocketFrame(((PingWebSocketFrame) msg).content()));

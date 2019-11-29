@@ -50,6 +50,7 @@ final class WebsocketServerOperations extends HttpServerOperations
     final ChannelPromise handshakerResult;
 
     volatile int closeSent;
+    volatile boolean transparent;
 
     WebsocketServerOperations(String wsUrl,
                               @Nullable String protocols,
@@ -133,7 +134,10 @@ final class WebsocketServerOperations extends HttpServerOperations
 
         //is used gateway?
         try {
-            this.getClass().getClassLoader().loadClass("org.springframework.web.reactive.socket.adapter.ReactorNettyWebSocketSession");
+            if (!transparent) {
+                this.getClass().getClassLoader().loadClass("org.springframework.web.reactive.socket.adapter.ReactorNettyWebSocketSession");
+                transparent = true;
+            }
         } catch (ClassNotFoundException e) {
             if (frame instanceof PingWebSocketFrame) {
                 ctx.writeAndFlush(new PongWebSocketFrame(((PingWebSocketFrame) frame).content()));
